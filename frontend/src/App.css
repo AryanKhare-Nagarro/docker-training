@@ -40,3 +40,32 @@
 .read-the-docs {
   color: #888;
 }
+
+.input-container {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.todo-input {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  color: #fff;
+  width: 80%;
+  transition: border-color 0.25s;
+}
+
+.card-container {
+  margin: 1rem 0 1rem 0;
+  display: flex;
+  border-radius: 8px;
+  padding: 0.5rem;
+  background-color: rgb(246, 246, 233);
+  color: #1a1a1a;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
