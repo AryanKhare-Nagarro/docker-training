@@ -34,7 +34,6 @@ build/
 Thumbs.db
 
 # Package manager files
-package-lock.json
 yarn.lock
 
 # Coverage directory
