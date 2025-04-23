@@ -24,7 +24,9 @@ function App() {
           onChange={(e) => setTodo(e.target.value)}
           className="todo-input"
         />
-        <button onClick={() => addTodo(todo, setTodo, setAllTodos)}>Add</button>
+        <button 
+          onClick={() => addTodo(todo, setTodo, setAllTodos)}
+          disabled={todo.trim() === ""}>Add</button>
       </div>
 
       <div className="todo-container">

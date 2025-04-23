@@ -69,3 +69,9 @@
   justify-content: space-between;
   flex-wrap: wrap;
 }
+
+button:disabled {
+  cursor: not-allowed;
+  outline: none;
+  border: none;
+}
