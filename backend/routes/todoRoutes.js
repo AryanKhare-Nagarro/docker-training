@@ -3,6 +3,6 @@ import { createTodo, deleteTodo, getAllTodos } from '../controllers/Todo.control
 
 export const TodoRouter = express.Router();
 
-TodoRouter.get('/', createTodo);
-TodoRouter.post('/', getAllTodos);
+TodoRouter.get('/', getAllTodos);
+TodoRouter.post('/', createTodo);
 TodoRouter.delete('/', deleteTodo);
