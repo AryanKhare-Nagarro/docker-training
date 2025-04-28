@@ -5,7 +5,7 @@ import redis from 'redis';
 // Note: Ensure that Redis server is running on docker container with port 6379 exposed
 export const client = redis.createClient({
     socket: {
-        host: 'localhost',
+        host: 'redis',
         port: 6379,
     },
 });
