@@ -1,9 +1,9 @@
 // Import Redis client
-import redis from 'redis';
+import { createClient } from 'redis';
 
 // Create a Redis client with connection details
 // Note: Ensure that Redis server is running on docker container with port 6379 exposed
-export const client = redis.createClient({
+export const client = createClient({
     socket: {
         host: 'redis',
         port: 6379,

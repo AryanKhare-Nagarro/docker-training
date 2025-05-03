@@ -24,6 +24,9 @@ export const getAllTodos = async (req, res) => {
 // Create a new todo in the MongoDB collection and cache it
 export const createTodo = async (req, res) => {
   const { todo } = req.body;  // Extract todo from request body
+  if(!todo) {
+    return res.status(400).json({ message: "Todo text is required" });
+  }
   try {
     // Create a new Todo instance and save it to the database
     const newTodo = new Todo({ text: todo });

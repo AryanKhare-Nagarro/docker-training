@@ -1,37 +1,25 @@
-version: "3.3"
+version: '3.8'
 
 services:
-  # Backend service configuration
-  todo-backend:
-    image: aryankharenagarro/todo-backend:latest
-    container_name: todo-backend
-    working_dir: /app/backend
+  backend:
+    build: ./backend
+    container_name: todo-backend-dev
     ports:
-      - "3000:3000" # Map port 3000 on the host to port 3000 in the container
+      - "${BACKEND_PORT}:3000"
+    env_file:
+      - .env.dev
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - MONGO_URL=${MONGO_URL}
+      - REDIS_URL=${REDIS_URL}
+      - BACKEND_PORT=${BACKEND_PORT}
     depends_on:
-      - redis # Ensure Redis is up before backend
-      - mongo # Ensure MongoDB are up before backend
+      - mongo
+      - redis
+    networks:
+      todo-dev-network:
+        driver: bridge
+    volumes:
+      - mongodb_data: data/db
+	
   
-  # Frontend service configuration
-  todo-frontend:
-    image: aryankharenagarro/todo-frontend:latest
-    container_name: todo-frontend
-    working_dir: /app/frontend
-    ports:
-      - "5173:5173" # Map port 5173 on the host to port 5173 in the container
-    depends_on:
-      - todo-backend  # Ensure backend is up before frontend
-  
-  # Redis service configuration
-  redis:
-    image: redis:alpine
-    container_name: redis-container
-    ports:
-      - "6379:6379" # Map port 6379 on the host to port 6379 in the container
-  
-  # MongoDB service configuration
-  mongo:
-    image: mongo:latest
-    container_name: mongo-container
-    ports:
-      - "27017:27017" # Map port 27017 on the host to port 27017 in the container

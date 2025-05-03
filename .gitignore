@@ -18,7 +18,9 @@ build/
 
 # Environment variables
 .env
-.env.*.local
+.env.dev
+.env.prod
+.env.test
 
 # IDE specific files
 .vscode/
