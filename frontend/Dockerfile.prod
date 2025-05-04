@@ -1,0 +1,8 @@
+# Production Environment Dockerfile
+
+FROM node:18-slim
+WORKDIR /frontend/prod
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
+COPY . ./
+CMD [ "npm", "run", "dev"]
