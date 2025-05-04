@@ -1,9 +1,0 @@
-# Testing Environment Dockerfile
-
-FROM node:slim
-WORKDIR /backend/test
-COPY package.json package-lock.json ./
-RUN npm install --include=dev
-COPY . ./
-# No need to EXPOSE a port here, as we will use docker-compose to manage the ports
-CMD [ "npm", "test" ]

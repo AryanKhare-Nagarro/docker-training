@@ -1,9 +1,0 @@
-# Development Environment Dockerfile
-
-FROM node:18-slim
-WORKDIR /backend/app
-COPY package.json package-lock.json ./
-RUN npm ci --include=dev
-COPY . ./
-# No need to EXPOSE a port here, as we will use docker-compose to manage the ports
-CMD [ "npx", "nodemon", "index.js" ]
