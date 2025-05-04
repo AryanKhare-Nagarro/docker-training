@@ -10,7 +10,7 @@ import { fetchTodos } from "./FetchTodos";
 export const handleDelete = async (_id, setAllTodos) => {
     try {
         // Send a DELETE request to the server to delete the todo item
-        const response = await fetch('http://localhost:3000', {
+        const response = await fetch('/api', {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',

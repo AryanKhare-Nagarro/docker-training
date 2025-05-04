@@ -11,7 +11,7 @@ import { fetchTodos } from "./FetchTodos";
 export const addTodo = async (todo, setTodo, setAllTodos) => {
   try {
     // Send a POST request to the server to add a new todo
-    const response = await fetch("http://localhost:3000", {
+    const response = await fetch('/api', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

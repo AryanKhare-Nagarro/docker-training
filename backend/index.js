@@ -4,9 +4,10 @@ import cors from "cors";
 import { connectDB } from "./db/ConnectDB.js";
 import { TodoRouter } from "./routes/todoRoutes.js";
 import { connectRedis } from "./db/ConnectCache.js";
+import { configs } from "./config.js"; // Importing config for environment variables
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = configs.server.port; // Set the port from environment variables
 
 connectDB();  // Connect to MongoDB
 connectRedis(); // Connect to Redis Cache

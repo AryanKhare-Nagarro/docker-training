@@ -6,7 +6,7 @@
 export const fetchTodos = async (setAllTodos) => {
   try {
     // Send a GET request to the server to fetch all todos
-    const response = await fetch("http://localhost:3000", {
+    const response = await fetch('/api', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

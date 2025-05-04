@@ -1,0 +1,104 @@
+# Docker Compose file for development environment
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    image: ${BACKEND_IMAGE_NAME}:${BACKEND_IMAGE_TAG}
+    container_name: todo-backend-dev
+    ports:
+      - "${BACKEND_PORT}:3000"
+    env_file:
+      - .env.dev
+    environment:
+      - NODE_ENV=development
+      - MONGO_URL=mongodb://mongo:${MONGO_DB_PORT}/${MONGO_DB_NAME}
+      - REDIS_PORT=${REDIS_PORT}
+      - BACKEND_PORT=${BACKEND_PORT}
+    depends_on:
+      mongo:
+        condition: service_started
+      redis:
+        condition: service_started
+    networks:
+      - todo-dev-network
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://backend:3000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+# frontend service      
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    image: ${FRONTEND_IMAGE_NAME}:${FRONTEND_IMAGE_TAG}
+    container_name: todo-frontend-dev
+    ports:
+      - "${FRONTEND_PORT}:5173"
+    env_file:
+      - .env.dev
+    environment:
+      - NODE_ENV=development
+      - BACKEND_URL=http://backend:${BACKEND_PORT}
+    depends_on:
+      backend:
+        condition: service_started
+    networks:
+      - todo-dev-network
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    restart: unless-stopped
+  
+# MongoDB service
+  mongo:
+    image: mongo:latest
+    container_name: todo-mongo-dev
+    ports:
+      - "${MONGO_DB_PORT}:27017"
+    networks:
+      - todo-dev-network
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+# Redis service
+  redis:
+    image: redis:alpine
+    container_name: todo-redis-dev
+    ports:
+      - "${REDIS_PORT}:6379"
+    networks:
+      - todo-dev-network
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+# Network configuration
+networks:
+  todo-dev-network:
+    driver: bridge
+
+# Volumes configuration
+volumes:
+  mongodb_data:
+    name: todo-mongodb-data
+  redis_data:
+    name: todo-redis-data
