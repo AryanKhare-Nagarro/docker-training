@@ -43,12 +43,13 @@ services:
     image: ${FRONTEND_IMAGE_NAME}:dev
     container_name: frontend-dev
     ports:
-      - "${FRONTEND_PORT}:5173"
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
     env_file:
       - .env.dev
     environment:
       - NODE_ENV=development
       - BACKEND_URL=http://backend:${BACKEND_PORT}
+      - FRONTEND_PORT=${FRONTEND_PORT}
     depends_on:
       backend:
         condition: service_started

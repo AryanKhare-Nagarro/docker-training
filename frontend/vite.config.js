@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     server: {
       host: true,  // Needed for Docker
-      port: 5173,
+      port: env.FRONTEND_PORT,
       strictPort: true,
       watch: {
         usePolling: true  // Needed for file watching in Docker
