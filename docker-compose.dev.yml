@@ -6,10 +6,10 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
-    image: ${BACKEND_IMAGE_NAME}:${BACKEND_IMAGE_TAG}
-    container_name: todo-backend-dev
+    image: ${BACKEND_IMAGE_NAME}:dev
+    container_name: backend-dev
     ports:
-      - "${BACKEND_PORT}:3000"
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
     env_file:
       - .env.dev
     environment:
@@ -23,13 +23,13 @@ services:
       redis:
         condition: service_started
     networks:
-      - todo-dev-network
+      - dev-network
     volumes:
       - ./backend:/app
       - /app/node_modules
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://backend:3000/"]
+      test: ["CMD", "curl", "-f", "http://backend:${BACKEND_PORT}/"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -40,8 +40,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
-    image: ${FRONTEND_IMAGE_NAME}:${FRONTEND_IMAGE_TAG}
-    container_name: todo-frontend-dev
+    image: ${FRONTEND_IMAGE_NAME}:dev
+    container_name: frontend-dev
     ports:
       - "${FRONTEND_PORT}:5173"
     env_file:
@@ -53,7 +53,7 @@ services:
       backend:
         condition: service_started
     networks:
-      - todo-dev-network
+      - dev-network
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -62,11 +62,11 @@ services:
 # MongoDB service
   mongo:
     image: mongo:latest
-    container_name: todo-mongo-dev
+    container_name: mongo-dev
     ports:
-      - "${MONGO_DB_PORT}:27017"
+      - "${MONGO_DB_PORT}:${MONGO_DB_PORT}"
     networks:
-      - todo-dev-network
+      - dev-network
     volumes:
       - mongodb_data:/data/db
     healthcheck:
@@ -78,11 +78,11 @@ services:
 # Redis service
   redis:
     image: redis:alpine
-    container_name: todo-redis-dev
+    container_name: redis-dev
     ports:
-      - "${REDIS_PORT}:6379"
+      - "${REDIS_PORT}:${REDIS_PORT}"
     networks:
-      - todo-dev-network
+      - dev-network
     volumes:
       - redis_data:/data
     healthcheck:
@@ -93,12 +93,12 @@ services:
 
 # Network configuration
 networks:
-  todo-dev-network:
+  dev-network:
     driver: bridge
 
 # Volumes configuration
 volumes:
   mongodb_data:
-    name: todo-mongodb-data
+    name: mongodb-data
   redis_data:
-    name: todo-redis-data
+    name: redis-data
