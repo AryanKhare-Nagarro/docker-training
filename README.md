@@ -90,8 +90,8 @@ A full-stack Todo application with React (Vite), Node.js backend, MongoDB, and R
 ![production env running](./screenshots/prod-env.png)
 
 📌 Note: The backend and frontend docker image for production environment is being pulled from the DockerHub.
-Frontend: `aryankharenagarro/todo-frontend:prod`
-Backend: `aryankharenagarro/todo-backend:prod`
+Frontend: `docker pull aryankharenagarro/todo-frontend:prod`
+Backend: `docker pull aryankharenagarro/todo-backend:prod`
 
 ### Ports:
 - Frontend only: `http://localhost:5173/`
