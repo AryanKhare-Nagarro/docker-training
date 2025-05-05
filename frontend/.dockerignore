@@ -1,4 +1,4 @@
 node_modules/
 .git/
-dockerfile.prod
-dockerfile.dev
+Dockerfile.prod
+Dockerfile.dev

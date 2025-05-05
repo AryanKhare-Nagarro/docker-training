@@ -21,9 +21,10 @@ describe('Todo Controller Unit Tests', () => {
       status: jest.fn().mockReturnThis(),
       json: jest.fn()
     };
-    mockNext = jest.fn();
+    mockNext = jest.fn(); // Mock next middleware function
   });
 
+  // Test for the getAllTodos function
   describe('getAllTodos', () => {
     it('should return 200 with all todos when successful', async () => {
       const mockTodos = [
@@ -34,7 +35,9 @@ describe('Todo Controller Unit Tests', () => {
 
       await getAllTodos(mockRequest, mockResponse);
 
+      // Check if the find method was called with an empty object
       expect(Todo.find).toHaveBeenCalledWith({});
+      // Check if the response status and json methods were called with correct arguments
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith(mockTodos);
     });
@@ -49,6 +52,7 @@ describe('Todo Controller Unit Tests', () => {
     });
   });
 
+  // Test for the createTodo function
   describe('createTodo', () => {
     it('should create todo, cache it, and return 201 when successful', async () => {
       const mockTodo = { 
@@ -67,6 +71,7 @@ describe('Todo Controller Unit Tests', () => {
         '507f1f77bcf86cd799439011', 
         'New todo'
       );
+      // Verify the response status and json methods were called with correct arguments
       expect(mockResponse.status).toHaveBeenCalledWith(201);
       expect(mockResponse.json).toHaveBeenCalledWith({
         message: 'Todo created successfully!'
@@ -85,6 +90,7 @@ describe('Todo Controller Unit Tests', () => {
     });
   });
 
+  // Test for the deleteTodo function
   describe('deleteTodo', () => {
     it('should delete todo, remove from cache, and return 200 when successful', async () => {
       mockRequest.body = { _id: '507f1f77bcf86cd799439011' };
@@ -97,6 +103,7 @@ describe('Todo Controller Unit Tests', () => {
         _id: '507f1f77bcf86cd799439011' 
       });
       expect(client.del).toHaveBeenCalledWith('507f1f77bcf86cd799439011');
+      // Verify the response status and json methods were called with correct arguments
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith({
         message: 'Todo deleted successfully!'

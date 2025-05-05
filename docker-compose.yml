@@ -1,16 +1,24 @@
-version: '3.8'
-name: todos-app
+# Name of the application
+name: todos-app 
 
 services:
-  # Shared services
+  # ------------ Shared services -------------- #
   mongo:
-    image: mongo:latest
-    container_name: mongo-${ENV:-dev}
-    # no need to expose the port for the mongo service in production
+    image: mongo:latest # Use the latest version of MongoDB
+    container_name: mongo-${ENV:-dev} # Dynamic container name based on the environment
+    
+    # no need to expose the port for the mongo service
+    # mongo is accessible for all the service through the same network
+    # and the mongo service is not exposed to the outside world
+
     networks:
       - ${ENV:-dev}-network
+
+    # Persisting MongoDB data in a volume
     volumes:
       - mongodb-data-${ENV:-dev}:/data/db
+    
+    # Using a healthcheck to ensure MongoDB is up and running before starting the application
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 30s
@@ -18,13 +26,21 @@ services:
       retries: 3
 
   redis:
-    image: redis:alpine
-    container_name: redis-${ENV:-dev}
-    # no need to expose the port for the redis service in production
+    image: redis:alpine # Use the lightweight Alpine version of Redis
+    container_name: redis-${ENV:-dev} # Dynamic container name based on the environment
+    
+    # no need to expose the port for the redis service
+    # redis is accessible for all the service through the same network
+    # and the redis service is not exposed to the outside world
+
     networks:
       - ${ENV:-dev}-network
+    
+    # Persisting Redis data in a volume
     volumes:
       - redis-data-${ENV:-dev}:/data
+    
+    # Using a healthcheck to ensure Redis is up and running before starting the application
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 30s
@@ -34,123 +50,165 @@ services:
 # ----------- Profile Configuration ------------- #
   # --------- Development Profile --------- #
   backend-dev:
-    profiles: ["dev"]
+    profiles: ["dev"] # Enable this service only in dev mode
     build:
       context: ./backend
-      dockerfile: Dockerfile.dev
-    image: ${BACKEND_IMAGE_NAME}:dev
-    container_name: backend-dev
+      dockerfile: Dockerfile.dev  # Use the Dockerfile.dev for development environment
+    image: ${BACKEND_IMAGE_NAME}:dev  # Dynamic image name based on the environment
+    container_name: backend-dev # Setting container name
     ports:
-      - "${DEV_BACKEND_PORT}:${DEV_BACKEND_PORT}"
+      - "${DEV_BACKEND_PORT}:${DEV_BACKEND_PORT}" # Mapping the backend port to the host
     env_file:
-      - .env
+      - .env  # Load environment variables from .env file
+    
+    # Using environment variables for dynamic configuration
     environment:
       - BACKEND_PORT=${DEV_BACKEND_PORT}
       - MONGO_URL=mongodb://mongo:27017/${DEV_MONGO_DB_NAME}
+    
+    # Ensure MongoDB and Redis are started before the backend service
     depends_on:
       mongo:
           condition: service_started
       redis:
           condition: service_started
+    
+    # Using the dev-network for development environment
     networks:
       - dev-network
+    
     volumes:
-      - ./backend:/app
-      - /app/node_modules
+      - ./backend:/app # Mounting the backend source code for live reload
+      - /app/node_modules # Exclude node_modules from the host
+    
+    # Restart the container unless stopped manually
     restart: unless-stopped
       
   frontend-dev:
-    profiles: ["dev"]
+    profiles: ["dev"] # Enable this service only in dev mode
     build:
       context: ./frontend
-      dockerfile: Dockerfile.dev
-    image: ${FRONTEND_IMAGE_NAME}:dev
-    container_name: frontend-dev
+      dockerfile: Dockerfile.dev # Use the Dockerfile.dev for development environment
+    image: ${FRONTEND_IMAGE_NAME}:dev # Dynamic image name based on the environment
+    container_name: frontend-dev # Setting container name
     ports:
-      - "${DEV_FRONTEND_PORT}:${DEV_FRONTEND_PORT}"
+      - "${DEV_FRONTEND_PORT}:${DEV_FRONTEND_PORT}" # Mapping the frontend port to the host
     env_file:
-      - .env
+      - .env # Load environment variables from .env file
+    
+    # Using environment variables for dynamic configuration
     environment:
       - BACKEND_URL=http://backend-dev:${DEV_BACKEND_PORT}
       - FRONTEND_PORT=${DEV_FRONTEND_PORT}
+    
+    # Ensure backend service is started before the frontend service
     depends_on:
       backend-dev:
         condition: service_started
+    
+    # Using the dev-network for development environment
     networks:
       - dev-network
+    
     volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    restart: unless-stopped
+      - ./frontend:/app # Mounting the frontend source code for live reload
+      - /app/node_modules # Exclude node_modules from the host
+    restart: unless-stopped # Restart the container unless stopped manually
   
   # --------- Production Profile --------- #
   backend-prod:
-    profiles: ["prod"]
-    image: aryankharenagarro/todo-backend:prod
-    container_name: backend-prod
+    profiles: ["prod"] # Enable this service only in prod mode
+    image: aryankharenagarro/todo-backend:prod # Use the production image for backend from dockerHub
+    container_name: backend-prod # Setting container name
+
+    ## No need to expose the port for the backend service
+    ## backend is accessible to the frontend service throught the same network
+
     env_file:
-      - .env
+      - .env  # Load environment variables from .env file
+    
+    # Using environment variables for dynamic configuration
     environment:
       - BACKEND_PORT=${PROD_BACKEND_PORT}
       - MONGO_URL=mongodb://mongo:27017/${PROD_MONGO_DB_NAME}
+    
+    # Ensure MongoDB and Redis are started before the backend service
     depends_on:
       mongo:
           condition: service_started
       redis:
           condition: service_started
+    
+    # Using the prod-network for production environment
     networks:
       - prod-network
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
+    
+    # Restart the container unless stopped manually
     restart: unless-stopped
     
   frontend-prod:
-    profiles: ["prod"]
-    image: aryankharenagarro/todo-frontend:prod
-    container_name: frontend-prod
+    profiles: ["prod"] # Enable this service only in prod mode
+    image: aryankharenagarro/todo-frontend:prod # Use the production image for frontend from dockerHub
+    container_name: frontend-prod # Setting container name
     ports:
-      - "${PROD_FRONTEND_PORT}:${PROD_FRONTEND_PORT}"
+      - "${PROD_FRONTEND_PORT}:${PROD_FRONTEND_PORT}" # Mapping the frontend port to the host
     env_file:
-      - .env
+      - .env # Load environment variables from .env file
+    
+    # Using environment variables for dynamic configuration
     environment:
       - BACKEND_URL=http://backend-prod:${PROD_BACKEND_PORT}
       - FRONTEND_PORT=${PROD_FRONTEND_PORT}
+    
+    # Ensure backend service is started before the frontend service
     depends_on:
       backend-prod:
         condition: service_started
+    
+    # Using the prod-network for production environment
     networks:
       - prod-network
+    
+    # Restart the container unless stopped manually
     restart: unless-stopped
 
   # --------- Test Profile --------- #
+  ## No frontend service in test profile
+  ## Only backend service contains the unit tests
+
   backend-test:
-    profiles: ["test"]
+    profiles: ["test"]  # Enable this service only in test mode
     build:
       context: ./backend
-      dockerfile: Dockerfile.test
-    image: ${BACKEND_IMAGE_NAME}:test
-    container_name: backend-test
+      dockerfile: Dockerfile.test # Use the Dockerfile.test for testing environment
+    image: ${BACKEND_IMAGE_NAME}:test # Dynamic image name based on the environment
+    container_name: backend-test  # Setting container name
     ports:
-      - "${TEST_BACKEND_PORT}:${TEST_BACKEND_PORT}"
+      - "${TEST_BACKEND_PORT}:${TEST_BACKEND_PORT}" # Mapping the backend port to the host
     env_file:
-      - .env
+      - .env  # Load environment variables from .env file
+    
+    # Using environment variables for dynamic configuration
     environment:
       - BACKEND_PORT=${TEST_BACKEND_PORT}
       - MONGO_URL=mongodb://mongo:27017/${TEST_MONGO_DB_NAME}
+    
+    # Ensure MongoDB and Redis are started before the backend service
     depends_on:
       mongo:
           condition: service_started
       redis:
           condition: service_started
+    
+    # Using the test-network for testing environment
     networks:
       - test-network
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
+    
+    # Restart the container only on failure
     restart: on-failure
   
 # Network Configuration
+# Using the bridge driver for all networks
 networks:
   dev-network:
     driver: bridge
@@ -161,11 +219,14 @@ networks:
 
 # Volumes Configuration
 volumes:
+  # Persisting data for dev environment
   mongodb-data-dev:
   redis-data-dev:
 
+  # Persisting data for prod environment
   mongodb-data-prod:
   redis-data-prod:
 
+  # Persisting data for test environment
   mongodb-data-test:
   redis-data-test:
