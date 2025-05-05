@@ -20,6 +20,7 @@ A full-stack Todo application with React (Vite), Node.js backend, MongoDB, and R
 - ### Environment Configuration
     - Rename .env.sample to .env
     - Fill in all required variables (no empty values allowed).
+    - Each time, before running any environment, please change the ENV variable to `dev`, `test` or `prod`.
 
     **`Example .env:`**
     ```
