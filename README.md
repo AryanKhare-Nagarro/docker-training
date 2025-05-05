@@ -1,78 +1,120 @@
-# Docker Training
-This training is to gain the practical experience with **Docker** and understand how to manage containerized application and their environment effectively.
+# Dockerized Todo Application
+A full-stack Todo application with React (Vite), Node.js backend, MongoDB, and Redis, configured for development, testing, and production environments using Docker.
 
-## Key Takeaways
-- Learn about **Docker Images**.
-- Learn about **Docker Containers**.
-- How to create **Custom Docker Images**.
-- Get practical experience with Docker.
-- Run **Multiple Container** application with **Docker Compose**.
-- Setup **Custom Networks**.
-- How to use _Docker Registry_ i.e. **DockerHub**.
+<br>
 
-## Todo Application
-For this Docker training, I created a **Todo application**, which allows user to manage their tasks through user-friendly interface. User can _add_, _delete_ & _read_ all the todos.
+# 🚀 Quick Start
+* Prerequisites
+* Docker Engine (v20.10+)
+* Docker Compose (v1.29+)
+* Git
 
-Created sperate _Frontend_ & _Backend_ service for the application. Ensures seamless integration between services through _RESTful APIs_.
+<br>
 
-## Tech Stack
-- **Frontend**: React + Vite
-- **Backend**: NodeJS + Express 
-- **Database**: MongoDB
-- **Cache**: Redis
-- **Dependecies**: Mongoose, CORS
-- **Docker**: Docker
-- **Docker Compose**: Docker-Compose
+# 🔧 Setup Instructions
+- ### Clone the Repository
+    ```
+        git clone <repository-url>
+        cd <project-folder>
+    ```
+- ### Environment Configuration
+    - Rename .env.sample to .env
+    - Fill in all required variables (no empty values allowed).
 
-## Setup Instructions
-- ### Pre-requisites
-    - docker v20.10 or later
-    - docker compose v1.29.0 or later
+    **`Example .env:`**
+    ```
+        # ===== BASE CONFIGURATION ===== #
 
-- ### Repository
-    - Clone this repository.
-    - [GitHub repo: docker-training](https://github.com/AryanKhare-Nagarro/docker-training)
+        # Environment Configuration
+        ENV=dev
 
-- ### Run docker-compose
-    - Once the repository is clone on local, run **docker-compose**.
-    - ```docker-compose up -d```
-    - It will pull the _docker images_ from _DockerHub_ and create & run the docker containers for all the docker images in _detach mode_.
-    - It pulls 2 custom images of the backend and frontend service from the _DockerHub_
-    - Frontend: `aryankharenagarro/todo-frontend:latest`
-    - Backend: `aryankharenagarro/todo-backend:latest`
+        # Docker Images (common across environments)
+        BACKEND_IMAGE_NAME=backend
+        FRONTEND_IMAGE_NAME=frontend
 
-- ### Application is Ready to use
-    - Now applicatoin is ready to use.
-    - Expose MongoDB on `port: 27017`
-    - Expose Redis on `port: 6379`
-    - Backend: `http://localhost:3000`
-    - Frontend: [http://localhost:5173](http://localhost:5173)
+        # ===== DEVELOPMENT ===== #
+        DEV_BACKEND_PORT=8080
+        DEV_MONGO_DB_NAME=todos-dev
+        DEV_FRONTEND_PORT=7070
 
-- ### Backend Routes
-    - Base URL is mentioned above.
-    - `GET /`: Fetch all the todos.
-    - `POST /`: Create a new todo.
-    - `Delete /`: Delete a specific todo.
+        # ===== PRODUCTION ===== #
+        PROD_BACKEND_PORT=3000
+        PROD_MONGO_DB_NAME=todos-prod
+        PROD_FRONTEND_PORT=5173
 
-## Screenshots
-### `docker images`
-![docker images](./screenshots/docker-images.png)
+        # ===== TESTING ===== #
+        TEST_BACKEND_PORT=3001
+        TEST_MONGO_DB_NAME=todos-test
+    ```
 
-### `docker container ls`
-![docker container ls](./screenshots/docker-container-ls.png)
+    _⚠️ Critical: Ensure all ports are unique and not used by other applications._
 
-### Landing Page
-![application frontend](./screenshots/application-start.png)
+<br>
 
-### Data Populated Interface
-![data populated](./screenshots/data-populated.png)
+# 🛠️ Running the Application
+### 🧑‍💻 Development Environment
+
+```
+    docker compose --env-file .env --profile dev up --build backend-dev frontend-dev
+```
+
+![dev env running](./screenshots/dev-env.png)
+
+### Access Services:
+
+- Frontend: `http://localhost:7070/`
+- Backend API: `http://localhost:8080/`
+
+### Key Features:
+
+- Hot-reloading for frontend/backend code.
+- Volumes mounted for live code changes.
 
 
-## Managing Docker Contianers
-Once the containers are up and running,
+### 🧪 Testing Environment
+```
+    docker compose --env-file .env --profile test up --build
+```
 
-- To stop and remove the containers, execute the `docker-compose down` command. Keep in mind, this action will also delete the database data stored within the container.
+![test env running](./screenshots/test-env.png)
 
-- To only stop the execution of containers and retain them use `docker-compose stop`. This action will retaint the data in database within the container. 
+### Ports:
 
-- To again start a stopped containers, use `docker-compose start`. It will re-start the containers and also fetch the retained data from the database.
+- Backend: `3001`
+
+### 🚀 Production Environment
+```
+    docker compose --env-file .env --profile prod up -d
+```
+
+![production env running](./screenshots/prod-env.png)
+
+### Ports:
+- Frontend only: `http://localhost:5173/`
+- Databases run internally (no host ports exposed).
+
+# 🛑 Stopping Containers
+```
+    docker compose --profile dev down
+```
+
+# 🔍 Debugging Tips
+### Check Logs:
+```
+docker logs backend-dev
+```
+
+### Verify Running Containers:
+```
+    docker ps
+```
+
+# Application Running
+
+### Landing page
+![Landing page](./screenshots/application-start.png)
+
+### Data populated interface
+![Data populated interface](./screenshots/data-populated.png)
+
+📌 Note: Replace `<repository-url>` and `<project-folder>` with your actual Git repo and directory names.
