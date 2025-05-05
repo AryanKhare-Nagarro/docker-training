@@ -1,7 +1,6 @@
 const requiredEnvVars = [
     'BACKEND_PORT',
-    'MONGO_URL',
-    'REDIS_PORT',
+    'MONGO_URL'
 ];
 
 
@@ -15,9 +14,6 @@ for (const envVar of requiredEnvVars) {
 export const configs = {
     db: {
         mongodb_url: process.env.MONGO_URL,
-    },
-    cache: {
-        redis_port: process.env.REDIS_PORT,
     },
     server: {
         port: process.env.BACKEND_PORT,

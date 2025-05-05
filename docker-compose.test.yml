@@ -10,14 +10,12 @@ services:
     image: ${BACKEND_IMAGE_NAME}:test
     container_name: backend-test
     ports:
-      - "${BACKEND_PORT}:${BACKEND_PORT}"
+      - "${TEST_BACKEND_PORT}:${TEST_BACKEND_PORT}"
     env_file:
       - .env.test
     environment:
-      - NODE_ENV=test
-      - MONGO_URL=mongodb://mongo:${MONGO_DB_PORT}/${MONGO_DB_NAME}
-      - REDIS_PORT=${REDIS_PORT}
-      - BACKEND_PORT=${BACKEND_PORT}
+      - MONGO_URL=mongodb://localhost:${TEST_MONGO_DB_PORT}/${TEST_MONGO_DB_PORT}
+      - BACKEND_PORT=${TEST_BACKEND_PORT}
     depends_on:
       mongo:
         condition: service_started
@@ -35,7 +33,7 @@ services:
     image: mongo:latest
     container_name: mongo-test
     ports:
-      - "${MONGO_DB_PORT}:${MONGO_DB_PORT}"
+      - "${TEST_MONGO_DB_PORT}:27017"
     networks:
       - test-network
     volumes:
@@ -45,8 +43,7 @@ services:
   redis:
     image: redis:alpine
     container_name: redis-test
-    ports:
-      - "${REDIS_PORT}:${REDIS_PORT}"
+    # no need to expose the port for Redis in this case
     networks:
       - test-network
     volumes:

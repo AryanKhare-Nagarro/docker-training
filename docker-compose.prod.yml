@@ -7,10 +7,8 @@ services:
     env_file:
       - .env.prod
     environment:
-      - NODE_ENV=production
-      - MONGO_URL=mongodb://mongo:27017/${MONGO_DB_NAME}
-      - REDIS_PORT=6379
-      - BACKEND_PORT=${BACKEND_PORT}
+      - MONGO_URL=mongodb://mongo:27017/${PROD_MONGO_DB_NAME}
+      - BACKEND_PORT=${PROD_BACKEND_PORT}
     depends_on:
       mongo:
         condition: service_started
@@ -23,7 +21,7 @@ services:
       - /app/node_modules
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://backend:${BACKEND_PORT}/"]
+      test: ["CMD", "curl", "-f", "http://backend:${PROD_BACKEND_PORT}/"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -34,13 +32,12 @@ services:
     image: aryankharenagarro/todo-frontend:prod
     container_name: frontend-prod
     ports:
-      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+      - "${PROD_FRONTEND_PORT}:${PROD_FRONTEND_PORT}"
     env_file:
       - .env.prod
     environment:
-      - NODE_ENV=production
-      - BACKEND_URL=http://backend:${BACKEND_PORT}
-      - FRONTEND_PORT=${FRONTEND_PORT}
+      - BACKEND_URL=http://backend:${PROD_BACKEND_PORT}
+      - FRONTEND_PORT=${PROD_FRONTEND_PORT}
     depends_on:
       backend:
         condition: service_started
