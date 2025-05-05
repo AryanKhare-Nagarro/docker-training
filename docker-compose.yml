@@ -1,0 +1,171 @@
+version: '3.8'
+name: todos-app
+
+services:
+  # Shared services
+  mongo:
+    image: mongo:latest
+    container_name: mongo-${ENV:-dev}
+    # no need to expose the port for the mongo service in production
+    networks:
+      - ${ENV:-dev}-network
+    volumes:
+      - mongodb-data-${ENV:-dev}:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  redis:
+    image: redis:alpine
+    container_name: redis-${ENV:-dev}
+    # no need to expose the port for the redis service in production
+    networks:
+      - ${ENV:-dev}-network
+    volumes:
+      - redis-data-${ENV:-dev}:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    
+# ----------- Profile Configuration ------------- #
+  # --------- Development Profile --------- #
+  backend-dev:
+    profiles: ["dev"]
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    image: ${BACKEND_IMAGE_NAME}:dev
+    container_name: backend-dev
+    ports:
+      - "${DEV_BACKEND_PORT}:${DEV_BACKEND_PORT}"
+    env_file:
+      - .env
+    environment:
+      - BACKEND_PORT=${DEV_BACKEND_PORT}
+      - MONGO_URL=mongodb://mongo:27017/${DEV_MONGO_DB_NAME}
+    depends_on:
+      mongo:
+          condition: service_started
+      redis:
+          condition: service_started
+    networks:
+      - dev-network
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    restart: unless-stopped
+      
+  frontend-dev:
+    profiles: ["dev"]
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    image: ${FRONTEND_IMAGE_NAME}:dev
+    container_name: frontend-dev
+    ports:
+      - "${DEV_FRONTEND_PORT}:${DEV_FRONTEND_PORT}"
+    env_file:
+      - .env
+    environment:
+      - BACKEND_URL=http://backend-dev:${DEV_BACKEND_PORT}
+      - FRONTEND_PORT=${DEV_FRONTEND_PORT}
+    depends_on:
+      backend-dev:
+        condition: service_started
+    networks:
+      - dev-network
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    restart: unless-stopped
+  
+  # --------- Production Profile --------- #
+  backend-prod:
+    profiles: ["prod"]
+    image: aryankharenagarro/todo-backend:prod
+    container_name: backend-prod
+    env_file:
+      - .env
+    environment:
+      - BACKEND_PORT=${PROD_BACKEND_PORT}
+      - MONGO_URL=mongodb://mongo:27017/${PROD_MONGO_DB_NAME}
+    depends_on:
+      mongo:
+          condition: service_started
+      redis:
+          condition: service_started
+    networks:
+      - prod-network
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    restart: unless-stopped
+    
+  frontend-prod:
+    profiles: ["prod"]
+    image: aryankharenagarro/todo-frontend:prod
+    container_name: frontend-prod
+    ports:
+      - "${PROD_FRONTEND_PORT}:${PROD_FRONTEND_PORT}"
+    env_file:
+      - .env
+    environment:
+      - BACKEND_URL=http://backend-prod:${PROD_BACKEND_PORT}
+      - FRONTEND_PORT=${PROD_FRONTEND_PORT}
+    depends_on:
+      backend-prod:
+        condition: service_started
+    networks:
+      - prod-network
+    restart: unless-stopped
+
+  # --------- Test Profile --------- #
+  backend-test:
+    profiles: ["test"]
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.test
+    image: ${BACKEND_IMAGE_NAME}:test
+    container_name: backend-test
+    ports:
+      - "${TEST_BACKEND_PORT}:${TEST_BACKEND_PORT}"
+    env_file:
+      - .env
+    environment:
+      - BACKEND_PORT=${TEST_BACKEND_PORT}
+      - MONGO_URL=mongodb://mongo:27017/${TEST_MONGO_DB_NAME}
+    depends_on:
+      mongo:
+          condition: service_started
+      redis:
+          condition: service_started
+    networks:
+      - test-network
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    restart: on-failure
+  
+# Network Configuration
+networks:
+  dev-network:
+    driver: bridge
+  prod-network:
+    driver: bridge
+  test-network:
+    driver: bridge
+
+# Volumes Configuration
+volumes:
+  mongodb-data-dev:
+  redis-data-dev:
+
+  mongodb-data-prod:
+  redis-data-prod:
+
+  mongodb-data-test:
+  redis-data-test:
