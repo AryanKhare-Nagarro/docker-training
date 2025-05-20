@@ -1,8 +1,8 @@
-version: '3.8'
+version: '2.4'  # Keeping your original version
 
 services:  
   frontend:
-    image: aryankharenagarro/frontend:${TAG:-latest}
+    image: aryankharenagarro/frontend:latest
     container_name: frontend-production
     ports:
       - "${FRONTEND_PORT}:80"
@@ -11,19 +11,16 @@ services:
     environment:
       - FRONTEND_PORT=${FRONTEND_PORT}
       - BACKEND_URL=http://backend:${BACKEND_PORT}  
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 512M
+    mem_limit: 512m
+    cpus: 0.5
     networks:
       - app-network
     depends_on:
-      backend:
-        condition: service_started
+      - backend
+    user: root
 
   backend:
-    image: aryankharenagarro/backend:${TAG:-latest}
+    image: aryankharenagarro/backend:latest
     container_name: backend-production
     depends_on:
       - mongo
@@ -35,11 +32,8 @@ services:
       - BACKEND_PORT=${BACKEND_PORT}
     env_file:
       - .env
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 1G
+    mem_limit: 1g
+    cpus: 1.0
     networks:
       - app-network
 

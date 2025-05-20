@@ -1,14 +1,12 @@
 #!/bin/bash
 
-# Stop and remove existing containers
-docker-compose down --rmi local --remove-orphans
+cd "$(dirname "$0")/.." || exit
 
-# Pull latest images
-docker pull $DOCKER_HUB_USERNAME/backend:latest
-docker pull $DOCKER_HUB_USERNAME/frontend:latest
+docker compose down --rmi local --remove-orphans
 
-# Start new containers
-TAG=latest docker-compose up -d
+docker pull aryankharenagarro/backend:latest
+docker pull aryankharenagarro/frontend:latest
 
-# Cleanup old images (keep last 2 versions)
-docker image prune -f
+docker compose up -d
+
+echo "Deployment complete."
