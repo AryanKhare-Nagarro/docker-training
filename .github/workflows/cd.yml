@@ -27,12 +27,3 @@ jobs:
           
           docker build -f frontend/Dockerfile -t ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:latest .
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:latest
-
-      - name: Deploy to local machine
-        uses: appleboy/ssh-action@master
-        with:
-          envs: DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}
-          script: |
-            cd ../../scripts
-            chmod +x deploy-prod.sh
-            ./deploy-prod.sh
