@@ -1,0 +1,64 @@
+version: '2.4'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    env_file:
+      - .env
+    environment:
+      - BACKEND_URL=http://backend:${BACKEND_PORT}
+      - FRONTEND_PORT=${FRONTEND_PORT}
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+    networks:
+      - app-network
+    depends_on:
+      backend:
+        condition: service_started
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    env_file:
+      - .env
+    environment:
+      - BACKEND_PORT=${BACKEND_PORT}
+      - MONGO_URL=mongodb://mongo:27017/${MONGO_DB_NAME}
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    ports:
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
+    depends_on:
+      mongo:
+        condition: service_started
+      redis:
+        condition: service_started
+    networks:
+      - app-network
+  
+  mongo:
+    image: mongo:latest
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - app-network
+
+  redis:
+    image: redis:alpine
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongodb-data:
+    driver: local

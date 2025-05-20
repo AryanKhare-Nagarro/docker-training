@@ -1,0 +1,32 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build backend image
+        run: docker build -f backend/Dockerfile -t backend-app:ci-${{ github.sha }} ./backend
+
+      - name: Run backend tests
+        run: |
+          docker run --rm \
+            -e BACKEND_PORT=3000 \
+            -e MONGO_URL=mongodb://mongo:27017/testdb \
+            backend-app:ci-${{ github.sha }} \
+            npm test
+
+      - name: Build frontend image
+        if: always()
+        run: docker build -f frontend/Dockerfile -t frontend-app:ci-${{ github.sha }} ./frontend

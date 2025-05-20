@@ -1,17 +1,7 @@
-# Development Environment Dockerfile
-
-# Use the official Node.js image as a base image
-FROM node:18-slim
-
-# Set the working directory inside the container
-WORKDIR /backend/dev
+FROM node:18-alpine
+WORKDIR /app
 COPY package.json package-lock.json ./
-
-# Install dependencies, including dev dependencies
-RUN npm ci --include=dev    
-COPY . ./
-
-# No need to EXPOSE a port here, as we will use docker-compose to manage the ports
-
-# Use nodemon for hot reloading during development
-CMD [ "npx", "nodemon", "index.js" ]
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["npm", "run", "dev"]
