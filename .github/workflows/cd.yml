@@ -47,7 +47,9 @@ jobs:
 
           docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/backend:latest .
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/backend:latest
-          
+
+          cd ..
+          cd frontend
           docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:${{ env.FRONTEND_VERSION }} .
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:${{ env.FRONTEND_VERSION }}
 
