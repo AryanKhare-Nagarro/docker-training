@@ -19,8 +19,8 @@ docker pull mongo:latest
 docker pull redis:alpine
 
 # Stop and remove existing containers if they exist
-docker stop todo_backend_container todo_frontend_container todo_mongo_container todo_redis_container
-docker rm todo_backend_container todo_frontend_container todo_mongo_container todo_redis_container
+docker stop todo_backend_container todo_frontend_container mongo redis
+docker rm todo_backend_container todo_frontend_container mongo redis
 
 # Create network if it doesn't exist
 docker network inspect $NETWORK_NAME || \
@@ -47,13 +47,13 @@ docker run -d \
     $DOCKER_HUB_USERNAME/frontend:$FRONTEND_VERSION
 
 docker run -d \
-    --name todo_mongo_container \
+    --name mongo \
     --network $NETWORK_NAME \
     -v $VOLUME_NAME:/data/db \
     mongo:latest
 
 docker run -d \
-    --name todo_redis_container \
+    --name redis \
     --network $NETWORK_NAME \
     redis:alpine
 
