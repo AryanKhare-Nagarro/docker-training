@@ -28,4 +28,10 @@ jobs:
             npm test
 
       - name: Build frontend image
-        run: docker build -f frontend/Dockerfile -t frontend-app:ci-${{ github.sha }} ./frontend
+        run: |
+          mkdir -p frontend/nginx
+          cp nginx.conf frontend/nginx/
+          
+          docker build -f frontend/Dockerfile \
+            -t frontend-app:ci-${{ github.sha }} \
+            ./frontend
