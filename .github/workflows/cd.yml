@@ -14,16 +14,33 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      
+      - name: Get Backend Version
+        run: |
+          BACKEND_VERSION=$(node -p "require('./backend/package.json').version")
+          echo "BACKEND_VERSION=${BACKEND_VERSION}" >> $GITHUB_ENV
+      
+      - name: Get Frontend Version
+        run: |
+          FRONTEND_VERSION=$(node -p "require('./frontend/package.json').version")
+          echo "FRONTEND_VERSION=${FRONTEND_VERSION}" >> $GITHUB_ENV
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}      
+
       - name: Build and push production images
         run: |
+          docker build -f backend/Dockerfile -t ${{ secrets.DOCKER_HUB_USERNAME }}/backend:${{ env.BACKEND_VERSION }} .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/backend:${{ env.BACKEND_VERSION }}
+
           docker build -f backend/Dockerfile -t ${{ secrets.DOCKER_HUB_USERNAME }}/backend:latest .
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/backend:latest
           
+          docker build -f frontend/Dockerfile -t ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:${{ env.FRONTEND_VERSION }} .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:${{ env.FRONTEND_VERSION }}
+
           docker build -f frontend/Dockerfile -t ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:latest .
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:latest

@@ -5,37 +5,41 @@ services:
     image: aryankharenagarro/frontend:latest
     container_name: frontend-production
     ports:
-      - "${FRONTEND_PORT}:80"
+      - "${PROD_FRONTEND_PORT}:80"
     env_file:
       - .env
     environment:
-      - FRONTEND_PORT=${FRONTEND_PORT}
-      - BACKEND_URL=http://backend:${BACKEND_PORT}  
+      - FRONTEND_PORT=${PROD_FRONTEND_PORT}
+      - BACKEND_URL=http://backend-production:${PROD_BACKEND_PORT}  
     mem_limit: 512m
     cpus: 0.5
     networks:
       - app-network
     depends_on:
-      - backend
+      backend:
+        condition: service_started
     user: root
 
   backend:
     image: aryankharenagarro/backend:latest
     container_name: backend-production
-    depends_on:
-      - mongo
-      - redis
     ports:
-      - "${BACKEND_PORT}:${BACKEND_PORT}"
-    environment:
-      - MONGO_URL=mongodb://mongo:27017/${MONGO_DB_NAME}
-      - BACKEND_PORT=${BACKEND_PORT}
-    env_file:
-      - .env
+      - "${PROD_BACKEND_PORT}:${PROD_BACKEND_PORT}"
     mem_limit: 1g
     cpus: 1.0
+    env_file:
+      - .env
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/${PRODMONGO_DB_NAME}
+      - BACKEND_PORT=${PROD_BACKEND_PORT}
     networks:
       - app-network
+    depends_on:
+      mongo:
+        condition: service_started
+      redis:
+        condition: service_started
+    
 
   mongo:
     image: mongo:latest

@@ -10,13 +10,13 @@ services:
     env_file:
       - .env
     environment:
-      - BACKEND_URL=http://backend:${BACKEND_PORT}
-      - FRONTEND_PORT=${FRONTEND_PORT}
+      - BACKEND_URL=http://backend:${DEV_BACKEND_PORT}
+      - FRONTEND_PORT=${DEV_FRONTEND_PORT}
     volumes:
       - ./frontend:/app
       - /app/node_modules
     ports:
-      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+      - "${DEV_FRONTEND_PORT}:${DEV_FRONTEND_PORT}"
     networks:
       - app-network
     depends_on:
@@ -32,13 +32,13 @@ services:
     env_file:
       - .env
     environment:
-      - BACKEND_PORT=${BACKEND_PORT}
-      - MONGO_URL=mongodb://mongo:27017/${MONGO_DB_NAME}
+      - BACKEND_PORT=${DEV_BACKEND_PORT}
+      - MONGO_URL=mongodb://mongo:27017/${DEV_MONGO_DB_NAME}
     volumes:
       - ./backend:/app
       - /app/node_modules
     ports:
-      - "${BACKEND_PORT}:${BACKEND_PORT}"
+      - "${DEV_BACKEND_PORT}:${DEV_BACKEND_PORT}"
     depends_on:
       mongo:
         condition: service_started
