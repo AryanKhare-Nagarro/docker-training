@@ -18,6 +18,20 @@ A full-stack Todo application built with React (Vite), Node.js, MongoDB, and Red
 - WSL2 (for Windows users)
 - GitHub Account
 - Docker Hub Account
+- Node.js (v16+) - for local development
+
+## Version Management
+1. **Version Updates**:
+   - When making changes to either frontend or backend services:
+     - Update the version number in the respective `package.json` file
+     - This version number will be used to tag and push the Docker image to Docker Hub
+     - Follow semantic versioning (MAJOR.MINOR.PATCH) for version numbers
+
+2. **Version Consistency**:
+   - Ensure the same version number is used across:
+     - `package.json`
+     - Docker image tags
+     - Deployment scripts
 
 ## Initial Setup
 
@@ -53,10 +67,15 @@ BACKEND_IMAGE_NAME=
 FRONTEND_IMAGE_NAME=
 
 # Development Environment
-BACKEND_PORT=
-MONGO_DB_NAME=
-FRONTEND_PORT=
+DEV_BACKEND_PORT=
+DEV_MONGO_DB_NAME=
+DEV_FRONTEND_PORT=
 ```
+
+### 📌 Important Notes:
+- Choose PORT numbers that are not in use by other services on your local machine
+- Common conflicts occur with ports: 3000, 8080, 5173, 27017
+- Use netstat -tuln (Linux) or Get-NetTCPConnection (PowerShell) to check used ports
 
 ## Development Environment
 
@@ -140,6 +159,42 @@ The script will:
 
 Access production deployment:
 - Frontend: http://localhost:5173
+
+# Production Deployment Guide
+
+This document provides steps for deploying the application to production using Docker.
+
+## Deployment Workflow
+
+### 1️⃣ Prepare Deployment
+- Open `./scripts/deploy.sh`
+- Specify all required configurations at the top of the file:
+  - Docker Hub username
+  - Version numbers
+  - Port mappings
+  - Network/volume names
+
+### 2️⃣ Run Deployment
+Execute the deployment script:
+```
+./scripts/deploy.sh
+```
+
+### 3️⃣ Destroy Containers (when needed):
+
+```
+./scripts/down.sh
+```
+
+### 📌 Deployment Notes:
+
+The deployment script will automatically:
+
+- Pull the specified version images from Docker Hub
+- Create necessary networks and volumes
+- Start containers with proper configuration
+- If a specific version isn't available, the script will prompt to use the latest version
+
 
 ## Monitoring & Maintenance
 
