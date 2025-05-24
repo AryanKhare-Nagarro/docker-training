@@ -18,7 +18,7 @@ services:
     ports:
       - "${DEV_FRONTEND_PORT}:${DEV_FRONTEND_PORT}"
     networks:
-      - app-network
+      - todo-dev-network
     depends_on:
       backend:
         condition: service_started
@@ -45,7 +45,7 @@ services:
       redis:
         condition: service_started
     networks:
-      - app-network
+      - todo-dev-network
   
   mongo:
     image: mongo:latest
@@ -53,13 +53,13 @@ services:
     volumes:
       - mongodb-data:/data/db
     networks:
-      - app-network
+      - todo-dev-network
 
   redis:
     image: redis:alpine
     container_name: redis-container
     networks:
-      - app-network
+      - todo-dev-network
 
 networks:
   app-network:

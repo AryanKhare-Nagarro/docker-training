@@ -12,5 +12,4 @@ WORKDIR /app
 COPY --from=dependencies --chown=appuser:appgroup /app/node_modules ./node_modules
 COPY --chown=appuser:appgroup . .
 USER appuser
-EXPOSE 3000
 CMD ["node", "index.js"]
