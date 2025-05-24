@@ -30,7 +30,7 @@ jobs:
       - name: Build frontend image
         run: |
           mkdir -p frontend/nginx
-          cp nginx.conf frontend/nginx/
+          cp nginx/nginx.conf frontend/nginx/
           
           docker build -f frontend/Dockerfile \
             -t frontend-app:ci-${{ github.sha }} \
