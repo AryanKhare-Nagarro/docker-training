@@ -33,12 +33,14 @@ jobs:
 
       - name: Build and push production images
         run: |
+          cd ../../backend
           docker build -f backend/Dockerfile -t ${{ secrets.DOCKER_HUB_USERNAME }}/backend:${{ env.BACKEND_VERSION }} .
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/backend:${{ env.BACKEND_VERSION }}
 
           docker build -f backend/Dockerfile -t ${{ secrets.DOCKER_HUB_USERNAME }}/backend:latest .
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/backend:latest
           
+          cd ../../frontend
           docker build -f frontend/Dockerfile -t ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:${{ env.FRONTEND_VERSION }} .
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:${{ env.FRONTEND_VERSION }}
 
