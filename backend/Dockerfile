@@ -2,7 +2,7 @@
 FROM node:18-alpine AS dependencies
 WORKDIR /app
 COPY package.json ./
-RUN npm install --omit=dev
+RUN npm install
 
 # Stage 2: Production
 FROM node:18-alpine
